@@ -1,4 +1,10 @@
 from rest_framework import viewsets
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAdminUser,
+    IsAuthenticatedOrReadOnly,
+)
 
 from .serializers import AvailabilitySerializer, BookingSerializer
 from .models import Availability, Booking

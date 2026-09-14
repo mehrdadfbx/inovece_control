@@ -1,4 +1,10 @@
 from rest_framework import viewsets
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAdminUser,
+    IsAuthenticatedOrReadOnly,
+)
 
 from .serializers import BusinessSerializer, ServiceSerializer, SpecialistSerializer,SpecialistServiceSerializer
 from .models import Business, Service, Specialist, SpecialistService

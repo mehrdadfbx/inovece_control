@@ -1,17 +1,13 @@
 from django.contrib import admin
-from .models import Owner, Customer
+
+from users.models import User
+
 # Register your models here.
 
-class OwnerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone_number', 'created_at')
-    list_filter = ('created_at', 'id')
-    search_fields = ('name',)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'display_name', 'phone', 'role', 'is_active', 'created_by', 'last_login', 'created_at', 'updated_at')
+    list_filter = ('role', 'is_active')
+    search_fields = ('username', 'display_name', 'phone')
+    ordering = ('username',)
 
-admin.site.register(Owner, OwnerAdmin)
-
-class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'phone_number', 'created_at')
-    list_filter = ('created_at', 'id')
-    search_fields = ('name',)
-
-admin.site.register(Customer, CustomerAdmin)
+admin.site.register(User, UserAdmin)

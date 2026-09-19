@@ -53,6 +53,10 @@ class InvoiceItem(models.Model):
         super().save(*args, **kwargs)
         self.invoice.recalculate_total()        
 
+    def delete(self, *args, **kwargs):
+        invoice = self.invoice   # قبل از حذف نگهش دار
+        super().delete(*args, **kwargs)
+        invoice.recalculate_total()
 class InventoryLog(models.Model):
     CHANGE_TYPE_CHOICES = [
         ('in', 'In'),

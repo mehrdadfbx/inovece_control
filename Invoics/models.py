@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.utils import timezone
+from django.db.models import Sum
 
 class Invoice(models.Model):
     STATUS_CHOICES = [
@@ -24,11 +25,19 @@ class Invoice(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:
-            from django.utils import timezone
             last = Invoice.objects.order_by('id').last()
             next_id = (last.id + 1) if last else 1
             self.invoice_number = f"INV-{timezone.now().year}-{next_id:06d}"
         super().save(*args, **kwargs)
+
+    def recalculate_total(self):
+        result                    = self.items.aggregate(total=Sum('subtotal')) 
+        total                     = result.get('total') or 0
+        self.total_amount         = total 
+        self.save(update_fields   =['total_amount'])
+
+
+
 
 class InvoiceItem(models.Model):
     invoice    = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items')
@@ -42,6 +51,7 @@ class InvoiceItem(models.Model):
     def save(self, *args, **kwargs):
         self.subtotal = self.quantity * self.unit_price
         super().save(*args, **kwargs)
+        self.invoice.recalculate_total()        
 
 class InventoryLog(models.Model):
     CHANGE_TYPE_CHOICES = [

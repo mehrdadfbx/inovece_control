@@ -11,11 +11,11 @@ admin.site.register(Category, CategoryAdmin)
 
 class ComponyAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active',)
-    list_filter  = ('name')
+    list_filter  = ('name',)
 
 admin.site.register(Company, ComponyAdmin)
 
-class ProductAdmin(admin.modelAdmin):
+class ProductAdmin(admin.ModelAdmin):
     list_display = ('company', 'category', 'name', 'price', 'is_active')
     list_filter  = ('company', 'category', 'price', 'is_active')
 

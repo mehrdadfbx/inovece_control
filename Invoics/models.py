@@ -9,7 +9,7 @@ class Invoice(models.Model):
         ('paid', 'Paid'),
     ]
 
-    invoice_number = models.CharField(max_length=30, unique=True, auto_created=True)
+    invoice_number = models.CharField(max_length=30, unique=True)
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='invoices')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     total_amount = models.DecimalField(max_digits=16, decimal_places=2)
@@ -22,6 +22,13 @@ class Invoice(models.Model):
     created_at   = models.DateTimeField(auto_now_add=True)
     updated_at   = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if not self.invoice_number:
+            from django.utils import timezone
+            last = Invoice.objects.order_by('id').last()
+            next_id = (last.id + 1) if last else 1
+            self.invoice_number = f"INV-{timezone.now().year}-{next_id:06d}"
+        super().save(*args, **kwargs)
 
 class InvoiceItem(models.Model):
     invoice    = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items')
@@ -33,7 +40,7 @@ class InvoiceItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        self.subtotal = self.quantity + self.unit_price
+        self.subtotal = self.quantity * self.unit_price
         super().save(*args, **kwargs)
 
 class InventoryLog(models.Model):

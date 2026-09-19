@@ -1,7 +1,10 @@
 from itertools import product
+from urllib import request
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from users.permissions import IsAdminRole
 from .serializers import (
     InvoiceSerializer,
@@ -9,6 +12,8 @@ from .serializers import (
     InventoryLogSerializer,
     InventorySerializer,
 )
+
+
 from .models import Invoice, InvoiceItem, InventoryLog, Inventory
 
 
@@ -24,6 +29,13 @@ class InvoiceViewSet(viewsets.ModelViewSet):
     def perform_create(self,serializer):
         product =  serializer.validate_data['product']
         serializer.save(unit_price=product.price)
+
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        invoce = self.get_object()
+        return Response({"status": "totall update"})
+    
 
 
 class InvoiceItemViewSet(viewsets.ModelViewSet):

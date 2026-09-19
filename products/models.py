@@ -11,6 +11,10 @@ class Company(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+    def __str__(self):
+        return self.name
+
+
 class Category(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='categories')
     icon_url = models.URLField(max_length=500, blank=True, null=True)
@@ -20,6 +24,11 @@ class Category(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
+    def __str__(self):
+            return self.name
+
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['company', 'name'], name='unique_company_category_name'),

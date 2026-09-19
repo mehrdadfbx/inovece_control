@@ -9,29 +9,32 @@ class Invoice(models.Model):
         ('paid', 'Paid'),
     ]
 
-    invoice_number = models.CharField(max_length=30, unique=True)
+    invoice_number = models.CharField(max_length=30, unique=True, auto_created=True)
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='invoices')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     total_amount = models.DecimalField(max_digits=16, decimal_places=2)
-    order_date = models.DateField()
-    order_time = models.TimeField()
-    note = models.TextField(blank=True, null=True)
-    reviewed_by = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_invoices')
-    reviewed_at = models.DateTimeField(null=True, blank=True)
-    admin_note = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    order_date   = models.DateField()
+    order_time   = models.TimeField()
+    note         = models.TextField(blank=True, null=True)
+    reviewed_by  = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_invoices')
+    reviewed_at  = models.DateTimeField(null=True, blank=True)
+    admin_note   = models.TextField(blank=True, null=True)
+    created_at   = models.DateTimeField(auto_now_add=True)
+    updated_at   = models.DateTimeField(auto_now=True)
 
 
 class InvoiceItem(models.Model):
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey('products.Product', on_delete=models.CASCADE, related_name='invoice_items')
-    quantity = models.IntegerField()
+    invoice    = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items')
+    product    = models.ForeignKey('products.Product', on_delete=models.CASCADE, related_name='invoice_items')
+    quantity   = models.IntegerField()
     unit_price = models.DecimalField(max_digits=14, decimal_places=2)
-    subtotal = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
+    subtotal   = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        self.subtotal = self.quantity + self.unit_price
+        super().save(*args, **kwargs)
 
 class InventoryLog(models.Model):
     CHANGE_TYPE_CHOICES = [

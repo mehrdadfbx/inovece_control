@@ -1,5 +1,7 @@
+from itertools import product
+
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from users.permissions import IsAdminRole
 from .serializers import (
     InvoiceSerializer,
@@ -17,7 +19,11 @@ class InvoiceViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAdminRole()]
-        return [IsAuthenticatedOrReadOnly()]
+        return [IsAuthenticated()]
+
+    def perform_create(self,serializer):
+        product =  serializer.validate_data['product']
+        serializer.save(unit_price=product.price)
 
 
 class InvoiceItemViewSet(viewsets.ModelViewSet):
